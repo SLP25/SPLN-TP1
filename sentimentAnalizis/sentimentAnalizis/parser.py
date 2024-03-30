@@ -45,8 +45,8 @@ def processWord(word: str) -> Iterable[str]:
 #Replaces latin characters and emojis and the input
 #is divided into sentences, which are themselves lists of words
 def process(input: str) -> list[list[str]]:
-    sentences = re.split(r"\.|!|\?", input)
-    return [list(itertools.chain.from_iterable(processWord(w) for w in s.split())) for s in sentences if s]
+    sentences = re.split(r"[.?!]", input)
+    return [list(itertools.chain.from_iterable(processWord(w) for w in re.split(r"[\s,;:\"']", s) if w)) for s in sentences if s]
 
 
 #Takes a list of words and returns a list of tokens
@@ -91,7 +91,7 @@ def evaluate(tokens: list[Base|Modifier]) -> list[Base]:
     for i, b in bases:
         applyModifiers(b, i, modifiers)
 
-    return bases
+    return [b for _,b in bases]
 
 
 #We can now use the already calculated tokens to add the emojis into the tokens
