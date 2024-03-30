@@ -22,5 +22,4 @@ def init():
     parseDatasets('parsedDatasets','datasets')
 
 def main():
-    while True:
-        analize()
+    analize()

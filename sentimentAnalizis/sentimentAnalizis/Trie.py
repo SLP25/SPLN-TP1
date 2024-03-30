@@ -4,14 +4,12 @@ def TrieDefaultDict():
     return Trie()
 
 class Trie:
-    def __init__(self,defaultValue=0,starters=[]):
+    def __init__(self,defaultValue=None,starter={}):
         self.items = defaultdict(TrieDefaultDict)
         self.value = defaultValue
-        for dict in starters:
-            for k,v in dict.items():
-                items = k.split(' ')
-                self.insert(items,v)
-                
+        for k,v in starter.items():
+            items = k.split(' ')
+            self.insert(items,v)
     
     def insert(self,items:list[str],value):
         if items==[]:
@@ -20,7 +18,8 @@ class Trie:
             self.items[items[0]].insert(items[1:],value)
     
     def search(self,items:list[str]):
-        if items==[]:
-            return self.value
+        if items==[] or items[0] not in self.items:
+            return (0, self.value)
         else:
-            return self.items[items[0]].search(items[1:])
+            (consumed, ans) = self.items[items[0]].search(items[1:])
+            return (consumed + 1, ans)
