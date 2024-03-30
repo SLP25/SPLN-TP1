@@ -104,6 +104,49 @@ def analize():
     input = sys.stdin.read()
     sentences = process(input)
     sentiment = [evaluate(tokenize(s)) for s in sentences]
-    
-    for s in sentiment:
-        print("  ".join(str(x) for x in s))
+    return sentiment
+
+
+def totalPolaritySentence(sentiment):
+    su=0
+    for sentence in sentiment:
+        for word in sentence:
+            su+=word.value()
+    return su/len(sentiment)
+
+def totalPolarityWord(sentiment):
+    su=0
+    wordCount=0
+    for sentence in sentiment:
+        for word in sentence:
+            su+=word.value()
+            wordCount+=1
+    return su/wordCount
+
+
+def separateSignals(sentiment):
+    positive=[]
+    negative=[]
+    for sentence in sentiment:
+        for word in sentence:
+            if word.value()<0: negative.append(word)
+            else: positive.append(word)
+    return (positive,negative)
+            
+
+            
+def calibrate(sentiment):
+    pos,neg = separateSignals(sentiment)
+    totalpos = sum(map(lambda x:x.value(),pos))
+    totalneg = sum(map(lambda x:x.value(),neg))
+    mult = totalneg/totalpos
+    with open('datasets/multiplier.txt','w') as f:
+        f.write(mult)
+
+def normalize(sentiment):
+    with open('datasets/multiplier.txt') as f:
+        normalizerMultiplier = float(f.read())
+
+
+
+        
