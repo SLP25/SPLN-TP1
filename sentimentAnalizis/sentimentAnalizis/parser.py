@@ -4,6 +4,7 @@ import itertools
 import json
 import sys
 import re
+from collections import defaultdict
 from bisect import bisect_left, bisect_right
 from .Trie import Trie
 from .Token import Base, Modifier
@@ -100,8 +101,7 @@ for emoji,description in emojis.items():
     tokens.insert([emoji], Base(emoji, value * 2))   #We give it an "emoji bonus" since emojis are usually emotionally charged
 
 
-def analize():
-    input = sys.stdin.read()
+def analize(input):
     sentences = process(input)
     sentiment = [evaluate(tokenize(s)) for s in sentences]
     return sentiment
@@ -112,7 +112,7 @@ def totalPolaritySentence(sentiment):
     for sentence in sentiment:
         for word in sentence:
             su+=word.value()
-    return su/len(sentiment)
+    return su/len(sentiment),len(sentiment)
 
 def totalPolarityWord(sentiment):
     su=0
@@ -121,18 +121,34 @@ def totalPolarityWord(sentiment):
         for word in sentence:
             su+=word.value()
             wordCount+=1
-    return su/wordCount
+    return su/wordCount,wordCount
 
 
 def separateSignals(sentiment):
     positive=[]
     negative=[]
     for sentence in sentiment:
+        n=[]
+        p=[]
         for word in sentence:
-            if word.value()<0: negative.append(word)
-            else: positive.append(word)
+            if word.value()<0: n.append(word)
+            elif word.value()>0: p.append(word)
+        positive.append(p)
+        negative.append(n)
     return (positive,negative)
-            
+
+def toTuples(list):
+    for word in list:
+        yield (word.text,word.value())
+
+def tuples2Dict(list):
+    d=defaultdict(lambda:0)
+    for i in list:
+        d[i[0]]+=i[1]
+    return d
+    
+    
+    
 
             
 def calibrate(sentiment):

@@ -5,16 +5,18 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "sentimentAnalizis"
 authors = [
-    {name = "Lumafepe", email = "lumafepe@gmail.com"},
+    {name = "lumafepe", email = "lumafepe@gmail.com"},
+    {name = "tiago-bacelar", email = "pereira.migueltiago@gmail.com"},
 ]
 classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 requires-python = ">=3.8"
 dynamic = ["version", "description"]
-dependencies = [ "unidecode" ] #TODO:: FIXME
+dependencies = [ "unidecode", "jjcli" ]
 
 [project.scripts]
 sentAnalize = "sentimentAnalizis:main"
 sentAnalize-init = "sentimentAnalizis:init"
+sentAnalize-calibrate = "sentimentAnalizis:calibrate"
     

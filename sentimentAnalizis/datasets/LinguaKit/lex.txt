@@ -1353,7 +1353,6 @@ doloso	NEGATIVE
 dom	POSITIVE
 donaire	POSITIVE
 donativo	POSITIVE
-dó	NEGATIVE
 dor	NEGATIVE
 douto	POSITIVE
 drogado	NEGATIVE
@@ -2544,7 +2543,6 @@ mandrião	NEGATIVE
 mandriar	NEGATIVE
 mandriice	NEGATIVE
 mangar	NEGATIVE
-manha	NEGATIVE
 manhoso	NEGATIVE
 manipresto	POSITIVE
 manipulação	NEGATIVE
@@ -3679,7 +3677,6 @@ vantagem	POSITIVE
 vantagoso	POSITIVE
 vantajosamente	POSITIVE
 vantajoso	POSITIVE
-vão	NEGATIVE
 varonil	POSITIVE
 vasca	NEGATIVE
 vasqueiro	NEGATIVE
