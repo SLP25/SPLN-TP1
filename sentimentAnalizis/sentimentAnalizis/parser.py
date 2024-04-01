@@ -159,10 +159,12 @@ def calibrate(sentiment):
     with open('datasets/multiplier.txt','w') as f:
         f.write(mult)
 
-def normalize(sentiment):
+def normalize(sentiment: list[list[Base]]):
     with open('datasets/multiplier.txt') as f:
         normalizerMultiplier = float(f.read())
 
-
-
-        
+    normalizer = Modifier("[NORMALIZER]", normalizerMultiplier)
+    for s in sentiment:
+        for b in s:
+            if b.value() < 0:
+                b.apply(normalizer)
