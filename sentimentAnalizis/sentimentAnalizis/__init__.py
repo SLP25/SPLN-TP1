@@ -7,13 +7,13 @@ Name
 SYNOPSIS
     -f <file> - Use file instead of stdin
     -n - Use normalization (only affects negative polarities)
-    -c - Word Counted for averages
+    -c - Print word counts
     -a - Calculate Average polarity
     -d - Individual averages for negative and positive polarities
-    -w - Calculate polarity for each word instead of sentence in the case of being averages
     -i <+|-> - Show only positive or negative polarity values
-    -s <inc|dec> - Sort the polarities by biggest or smallest respectivly
-    -l <limit> - limit how many polarities are shown
+    -s <dec|inc|alp> - Sort the polarities in increasing, decreasing or alphabetical orders, respectively (decreasing is default)
+    -l <limit> - Limit how many polarities are shown
+    --help - Show this help message
 
 
 DESCRIPTIONS
@@ -25,33 +25,71 @@ FILES:
 __version__ = "0.0.1"
 
 from .datasetParsers.parse import parseDatasets
-from .parser import analize,calibrate as calibrateFunc, normalize, totalPolaritySentence, totalPolarityWord,separateSignals,toTuples,tuples2Dict
+from .parser import analize,calibrate as calibrateFunc, normalize
+from .utils import collect
 import sys
 from jjcli import *
 from .datasetParsers.utils import getDatasetFolder
 from os.path import join as pathJoin
 
 def init():
-    
     parseDatasets(pathJoin(getDatasetFolder(),'parsedDatasets'),getDatasetFolder())
 
 def calibrate():
-    if len(sys.argv)!=2 or sys.argv[1]=='-h':
+    if len(sys.argv)!=2 or sys.argv[1]=='--help':
         print("usage: sentAnalize-calibrate -h for this guide")
         print("usage: sentAnalize-calibrate <file> calibrate the program so the inputed file equivalate 0")
     else:
         with open(sys.argv[1],'r') as f:
-            calibrateFunc(analize(f.read()))
+            bases,_ = analize(f.read())
+            calibrateFunc(bases)
 
+cl = clfilter("dcf:awl:i:s:n", doc=__doc__) ## Option values in cl.opt dictionary
 
+def print_stat(value, occurences, label=""):
+    prefix = f"{label} : " if label else ""
+    suffix = f" (x{occurences})" if "-c" in cl.opt else ""
+    print(f"{prefix}{value:.2f}{suffix}")
 
+def handle_bases(bases, wordCount):
+    #Calcualte average
+    if "-a" in cl.opt:
+        total = sum(b.value() for b in bases)
+        print_stat(total/wordCount, wordCount)      #TODO: divide by zero
 
+    #Or treat the words individually
+    else:   
+        out = [(w,sum(b.value() for b in bs)/len(bs),bs) for w,bs in collect(bases).items()]
+        
+        #Sort the output
+        reverse = cl.opt.get("-s") == "dec" or cl.opt.get("-s") == None
+        key = (lambda x: x[0]) if cl.opt.get("-s") == "alp" else (lambda x: x[1])
+        out.sort(key=key, reverse=reverse)
+    
+        #Limit the output
+        if "-l" in cl.opt:
+            out = out[:int(cl.opt.get("-l"))]
 
+        for word, value, bs in out:
+            print_stat(value, len(bs), word)
 
 
 def main():
-    cl = clfilter("dcf:awl:i:s:n", doc=__doc__) ## Option values in cl.opt dictionary
-    
+    if "-i" in cl.opt and "-d" in cl.opt:
+        print("Incompatible options: -i and -d")
+        return
+
+    if "-a" in cl.opt and "-l" in cl.opt:
+        print("Incompatible options: -a and -l")
+        return
+
+    if "-a" in cl.opt and "-s" in cl.opt:
+        print("Incompatible options: -a and -s")
+        return
+
+    #TODO: check values of -s -i -l
+
+    #Get the input
     in_data = "" 
     if "-f" in cl.opt:
         f = open(cl.opt.get("-f"))
@@ -59,71 +97,24 @@ def main():
         f.close()
     else:
         in_data = sys.stdin.read()
-    sentiment = analize(in_data)
 
+    #Analize the input
+    bases, wordCount = analize(in_data)
+
+    #Optionally normalize
     if "-n" in cl.opt:
-        normalize(sentiment)
-    
-    if "-a" in cl.opt:
-        if "-w" in cl.opt:
-            value,wordCount = totalPolaritySentence(sentiment)
-        else:
-            value,wordCount = totalPolarityWord(sentiment)
-        if '-c' in cl.opt:
-            value = f"{value} out of {wordCount} words" 
+        normalize(bases)
+
+    #Filter only one polarity
+    if "-i" in cl.opt:
+        pol = cl.opt.get("-i")
+        filter = (lambda v: v > 0) if pol == "+" else (lambda v: v < 0)
+        bases = [b for b in bases if filter(b.value())]
+        handle_bases(bases, wordCount)
+    #Output two results, one for each polarity
     elif "-d" in cl.opt:
-        pos,neg = separateSignals(sentiment)
-        if "-w" in cl.opt:
-            posValue,posWordCount = totalPolaritySentence(pos)
-            negValue,negWordCount = totalPolaritySentence(neg)
-        else:
-            posValue,posWordCount = totalPolarityWord(pos)
-            negValue,negWordCount = totalPolarityWord(neg)
-        if '-c' in cl.opt:
-            value = f"Positive:{posValue} out of {posWordCount} words\nNegative:{negValue} out of {negWordCount} words"
-        else:
-            value = f"Positive:{posValue}\nNegative:{negValue}"
-    else:
-        if "-i" in cl.opt:
-            positive,negative = separateSignals(sentiment)
-            pos,neg = [],[]
-            for p in positive:
-                for i in p:
-                    pos.append(i)
-            for n in negative:
-                for i in n:
-                    neg.append(i)
-            if cl.opt.get("-i")=='+':
-                value = toTuples(pos)
-            elif cl.opt.get("-i")=='-':
-                value = toTuples(neg)
-            else:
-                print("invalid option for flag i")
-                exit()
-        else:
-            value=[]
-            for words in sentiment:
-                for w in words:
-                    value.append((w.text,w.value()))
-        value = list(tuples2Dict(value).items())
-        if "-s" in cl.opt:
-            if cl.opt.get("-s")=='inc':
-                value.sort(key=lambda x:x[1])
-            elif cl.opt.get("-s")=='dec':
-                value.sort(reverse=True,key=lambda x:x[1])
-        else:
-            value.sort(key=lambda x:x[0])
-        if "-l" in cl.opt:
-            value = value[:int(cl.opt.get("-l"))]
-        value = '\n'.join(map(lambda x: f"{x[0]} : {x[1]}",value))
-    print(value)
-        
-            
-        
-        
-    
-            
-            
-        
-        
+        print("POSITIVOS")
+        handle_bases([b for b in bases if b.value() > 0], wordCount)
+        print("\nNEGATIVOS")
+        handle_bases([b for b in bases if b.value() < 0], wordCount)
     

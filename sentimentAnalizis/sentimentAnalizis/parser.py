@@ -2,12 +2,11 @@ from typing import Iterable
 from unidecode import unidecode
 import itertools
 import json
-import sys
 import re
-from collections import defaultdict
 from bisect import bisect_left, bisect_right
 from .Trie import Trie
 from .Token import Base, Modifier
+from .utils import enumerateWhen
 from .datasetParsers.utils import getDatasetFolder
 import os
 
@@ -66,12 +65,7 @@ def tokenize(sentence: list[str]) -> Iterable[Base|Modifier]:
             sentence = sentence[1:]
 
 
-def enumerateWhen(it, cond):
-    i = -1
-    for x in it:
-        if cond(x):
-            i += 1
-        yield (i, x)
+
 
 def applyModifiers(base: Base, index: int, modifiers: list[Modifier]):
     (before, after) = modify_mask
@@ -105,70 +99,28 @@ for emoji,description in emojis.items():
     tokens.insert([emoji], Base(emoji, value * 2))   #We give it an "emoji bonus" since emojis are usually emotionally charged
 
 
-def analize(input):
+def analize(input: str) -> tuple[list[Base], int]:
     sentences = process(input)
-    sentiment = [evaluate(tokenize(s)) for s in sentences]
-    return sentiment
+    words = sum(len(s) for s in sentences)
+    bases = list(itertools.chain.from_iterable(evaluate(tokenize(s)) for s in sentences))
+    return bases, words
 
 
-def totalPolaritySentence(sentiment):
-    su=0
-    for sentence in sentiment:
-        for word in sentence:
-            su+=word.value()
-    return su/len(sentiment),len(sentiment)
 
-def totalPolarityWord(sentiment):
-    su=0
-    wordCount=0
-    for sentence in sentiment:
-        for word in sentence:
-            su+=word.value()
-            wordCount+=1
-    return su/wordCount,wordCount
-
-
-def separateSignals(sentiment):
-    positive=[]
-    negative=[]
-    for sentence in sentiment:
-        n=[]
-        p=[]
-        for word in sentence:
-            if word.value()<0: n.append(word)
-            elif word.value()>0: p.append(word)
-        positive.append(p)
-        negative.append(n)
-    return (positive,negative)
-
-def toTuples(list):
-    for word in list:
-        yield (word.text,word.value())
-
-def tuples2Dict(list):
-    d=defaultdict(lambda:0)
-    for i in list:
-        d[i[0]]+=i[1]
-    return d
+def calibrate(bases: list[Base]):
+    totalpos = sum(x.value() for x in bases if x.value() > 0)
+    totalneg = sum(x.value() for x in bases if x.value() < 0)
     
-    
-    
+    mult = abs(totalneg/totalpos) #TODO: divide by zero
+    with open(os.path.join(DATASETFOLDER,'multiplier.txt'),'w') as f:
+        f.write(str(mult))
 
-            
-def calibrate(sentiment):
-    pos,neg = separateSignals(sentiment)
-    totalpos = sum(map(lambda x:x.value(),pos))
-    totalneg = sum(map(lambda x:x.value(),neg))
-    mult = totalneg/totalpos
-    with open(os.path.join(DATASETFOLDER,'multiplier.txt','w')) as f:
-        f.write(mult)
 
-def normalize(sentiment):
+def normalize(bases):
     with open(os.path.join(DATASETFOLDER,'multiplier.txt')) as f:
         normalizerMultiplier = float(f.read())
 
     normalizer = Modifier("[NORMALIZER]", normalizerMultiplier)
-    for s in sentiment:
-        for b in s:
-            if b.value() < 0:
-                b.apply(normalizer)
+    for b in bases:
+        if b.value() < 0:
+            b.apply(normalizer)

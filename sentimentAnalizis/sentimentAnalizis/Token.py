@@ -9,6 +9,9 @@ class Modifier:
     def is_modifier(self) -> bool:
         return True
     
+    def to_tuple(self):
+        return (self.text, self.value)
+    
 class Base:
     def __init__(self, text: str, value: float):
         self.text = text
@@ -28,3 +31,6 @@ class Base:
 
     def value(self) -> float:
         return self._value
+
+    def to_tuple(self):
+        return (self.text, self.value())
