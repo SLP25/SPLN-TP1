@@ -9,6 +9,7 @@ from .Token import Base, Modifier
 from .utils import enumerateWhen
 from .datasetParsers.utils import getDatasetFolder
 import os
+from copy import deepcopy
 
 DATASETFOLDER = getDatasetFolder()
 
@@ -59,7 +60,7 @@ def tokenize(sentence: list[str]) -> Iterable[Base|Modifier]:
     while sentence != []:
         (consumed, token) = tokens.search(sentence)
         if token != None:
-            yield token
+            yield deepcopy(token)
             sentence = sentence[consumed:]
         else:
             sentence = sentence[1:]
@@ -124,3 +125,4 @@ def normalize(bases):
     for b in bases:
         if b.value() < 0:
             b.apply(normalizer)
+

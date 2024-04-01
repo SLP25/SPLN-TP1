@@ -48,7 +48,7 @@ cl = clfilter("dcf:awl:i:s:n", doc=__doc__) ## Option values in cl.opt dictionar
 
 def print_stat(value, occurences, label="", trimDecimals=False):
     prefix = f"{label} : " if label else ""
-    ans = f"{value:.2f}" if trimDecimals else value
+    ans = f"{value:.2f}" if trimDecimals else f"{value:.12f}"
     suffix = f" (x{occurences})" if "-c" in cl.opt else ""
 
     print(f"{prefix}{ans}{suffix}")
@@ -60,8 +60,11 @@ def handle_bases(bases, wordCount):
         print_stat(total/wordCount, wordCount)      #TODO: divide by zero
 
     #Or treat the words individually
-    else:   
-        out = [(w,sum(b.value() for b in bs)/len(bs),bs) for w,bs in collect(bases).items()]
+    else:
+        out=[]
+        for w,bs in collect(bases).items():
+            avg = sum([b.value() for b in bs])/len(bs)
+            out.append((w,avg,bs))
         
         #Sort the output
         reverse = cl.opt.get("-s") == "dec" or cl.opt.get("-s") == None
@@ -110,8 +113,8 @@ def main():
     #Filter only one polarity
     if "-i" in cl.opt:
         pol = cl.opt.get("-i")
-        filter = (lambda v: v > 0) if pol == "+" else (lambda v: v < 0)
-        handle_bases([b for b in bases if filter(b.value())], wordCount)
+        filt = (lambda v: v.value() > 0) if pol == "+" else (lambda v: v.value() < 0)
+        handle_bases(list(filter(filt,bases)), wordCount)
     #Output two results, one for each polarity
     elif "-d" in cl.opt:
         print("POSITIVOS")

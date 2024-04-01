@@ -37,6 +37,7 @@ for capitulo in capitulos:
     vs = analyzer.polarity_scores(capitulo)
     leia.append(vs['compound'])
 
+print(leia)
 print("leia")
 
 
