@@ -167,6 +167,8 @@ def normalize(sentiment):
     with open(os.path.join(DATASETFOLDER,'multiplier.txt')) as f:
         normalizerMultiplier = float(f.read())
 
-
-
-        
+    normalizer = Modifier("[NORMALIZER]", normalizerMultiplier)
+    for s in sentiment:
+        for b in s:
+            if b.value() < 0:
+                b.apply(normalizer)

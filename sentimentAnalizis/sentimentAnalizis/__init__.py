@@ -6,13 +6,14 @@ Name
 
 SYNOPSIS
     -f <file> - Use file instead of stdin
+    -n - Use normalization (only affects negative polarities)
     -c - Word Counted for averages
     -a - Calculate Average polarity
     -d - Individual averages for negative and positive polarities
     -w - Calculate polarity for each word instead of sentence in the case of being averages
     -i <+|-> - Show only positive or negative polarity values
     -s <inc|dec> - Sort the polarities by biggest or smallest respectivly
-    -l - limit how many polarities are shown
+    -l <limit> - limit how many polarities are shown
 
 
 DESCRIPTIONS
@@ -24,7 +25,7 @@ FILES:
 __version__ = "0.0.1"
 
 from .datasetParsers.parse import parseDatasets
-from .parser import analize,calibrate as calibrateFunc, totalPolaritySentence, totalPolarityWord,separateSignals,toTuples,tuples2Dict
+from .parser import analize,calibrate as calibrateFunc, normalize, totalPolaritySentence, totalPolarityWord,separateSignals,toTuples,tuples2Dict
 import sys
 from jjcli import *
 from .datasetParsers.utils import getDatasetFolder
@@ -49,7 +50,7 @@ def calibrate():
 
 
 def main():
-    cl = clfilter("dcf:awl:i:s:", doc=__doc__) ## Option values in cl.opt dictionary
+    cl = clfilter("dcf:awl:i:s:n", doc=__doc__) ## Option values in cl.opt dictionary
     
     in_data = "" 
     if "-f" in cl.opt:
@@ -59,6 +60,9 @@ def main():
     else:
         in_data = sys.stdin.read()
     sentiment = analize(in_data)
+
+    if "-n" in cl.opt:
+        normalize(sentiment)
     
     if "-a" in cl.opt:
         if "-w" in cl.opt:
