@@ -111,7 +111,7 @@ def calibrate(bases: list[Base]):
     totalpos = sum(x.value() for x in bases if x.value() > 0)
     totalneg = sum(x.value() for x in bases if x.value() < 0)
     
-    mult = abs(totalneg/totalpos) #TODO: divide by zero
+    mult = abs(totalpos/totalneg) #TODO: divide by zero
     with open(os.path.join(DATASETFOLDER,'multiplier.txt'),'w') as f:
         f.write(str(mult))
 

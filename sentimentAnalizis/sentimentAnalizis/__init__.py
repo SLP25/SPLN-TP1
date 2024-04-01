@@ -46,10 +46,12 @@ def calibrate():
 
 cl = clfilter("dcf:awl:i:s:n", doc=__doc__) ## Option values in cl.opt dictionary
 
-def print_stat(value, occurences, label=""):
+def print_stat(value, occurences, label="", trimDecimals=False):
     prefix = f"{label} : " if label else ""
+    ans = f"{value:.2f}" if trimDecimals else value
     suffix = f" (x{occurences})" if "-c" in cl.opt else ""
-    print(f"{prefix}{value:.2f}{suffix}")
+
+    print(f"{prefix}{ans}{suffix}")
 
 def handle_bases(bases, wordCount):
     #Calcualte average
@@ -71,7 +73,7 @@ def handle_bases(bases, wordCount):
             out = out[:int(cl.opt.get("-l"))]
 
         for word, value, bs in out:
-            print_stat(value, len(bs), word)
+            print_stat(value, len(bs), word, True)
 
 
 def main():
@@ -109,12 +111,12 @@ def main():
     if "-i" in cl.opt:
         pol = cl.opt.get("-i")
         filter = (lambda v: v > 0) if pol == "+" else (lambda v: v < 0)
-        bases = [b for b in bases if filter(b.value())]
-        handle_bases(bases, wordCount)
+        handle_bases([b for b in bases if filter(b.value())], wordCount)
     #Output two results, one for each polarity
     elif "-d" in cl.opt:
         print("POSITIVOS")
         handle_bases([b for b in bases if b.value() > 0], wordCount)
         print("\nNEGATIVOS")
         handle_bases([b for b in bases if b.value() < 0], wordCount)
-    
+    else:
+        handle_bases(bases, wordCount)
