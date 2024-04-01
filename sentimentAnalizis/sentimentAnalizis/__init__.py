@@ -8,7 +8,7 @@ SYNOPSIS
     -f <file> - Use file instead of stdin
     -c - Word Counted for averages
     -a - Calculate Average polarity
-    -d - Individual averages for negative and possitive polarities
+    -d - Individual averages for negative and positive polarities
     -w - Calculate polarity for each word instead of sentence in the case of being averages
     -i <+|-> - Show only positive or negative polarity values
     -s <inc|dec> - Sort the polarities by biggest or smallest respectivly
@@ -27,9 +27,12 @@ from .datasetParsers.parse import parseDatasets
 from .parser import analize,calibrate as calibrateFunc, totalPolaritySentence, totalPolarityWord,separateSignals,toTuples,tuples2Dict
 import sys
 from jjcli import *
+from .datasetParsers.utils import getDatasetFolder
+from os.path import join as pathJoin
 
 def init():
-    parseDatasets('parsedDatasets','datasets')
+    
+    parseDatasets(pathJoin(getDatasetFolder(),'parsedDatasets'),getDatasetFolder())
 
 def calibrate():
     if len(sys.argv)!=2 or sys.argv[1]=='-h':

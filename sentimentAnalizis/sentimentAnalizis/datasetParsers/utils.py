@@ -4,7 +4,13 @@ import os
 import unidecode
 from collections import defaultdict
 
-with open('datasets/emojis.txt') as f:
+
+def getDatasetFolder():
+    datasetParsers,_ = os.path.split(__file__) 
+    sentimentAnalisisSub = os.path.join(datasetParsers,'..')
+    return os.path.join(sentimentAnalisisSub,'datasets')
+
+with open(os.path.join(getDatasetFolder(),'emojis.txt')) as f:
     emojisList=f.readline()
 
 def remove_accents(word):

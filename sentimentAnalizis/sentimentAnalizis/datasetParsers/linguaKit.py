@@ -1,4 +1,5 @@
-from .utils import parser
+from .utils import parser,getDatasetFolder
+import os
 
 def lex(destinationFolder):
     def aux(line):
@@ -6,7 +7,7 @@ def lex(destinationFolder):
         word = d[0]
         label = d[1]
         return (word,-1 if label == 'NEGATIVE' else 1)
-    parser("datasets/LinguaKit",'lex.txt',aux,destinationFolder)
+    parser(os.path.join(getDatasetFolder(),"LinguaKit"),'lex.txt',aux,destinationFolder)
     
 def train(destinationFolder):
     def aux(line):
@@ -14,7 +15,7 @@ def train(destinationFolder):
         word = d[0]
         label = d[1]
         return (word,-1 if label == 'NEGATIVE' else 1)
-    parser("datasets/LinguaKit",'train.txt',aux,destinationFolder)
+    parser(os.path.join(getDatasetFolder(),"LinguaKit"),'train.txt',aux,destinationFolder)
 
 def parseLinguaKit(destinationFolder):
     lex(destinationFolder)

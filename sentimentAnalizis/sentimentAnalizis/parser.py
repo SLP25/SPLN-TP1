@@ -8,9 +8,13 @@ from collections import defaultdict
 from bisect import bisect_left, bisect_right
 from .Trie import Trie
 from .Token import Base, Modifier
+from .datasetParsers.utils import getDatasetFolder
+import os
+
+DATASETFOLDER = getDatasetFolder()
 
 def load_dataset(dataset):
-    with open(f'datasets/{dataset}.json') as f:
+    with open(os.path.join(DATASETFOLDER,f'{dataset}.json')) as f:
         return json.load(f)
 
 
@@ -156,11 +160,11 @@ def calibrate(sentiment):
     totalpos = sum(map(lambda x:x.value(),pos))
     totalneg = sum(map(lambda x:x.value(),neg))
     mult = totalneg/totalpos
-    with open('datasets/multiplier.txt','w') as f:
+    with open(os.path.join(DATASETFOLDER,'multiplier.txt','w')) as f:
         f.write(mult)
 
 def normalize(sentiment):
-    with open('datasets/multiplier.txt') as f:
+    with open(os.path.join(DATASETFOLDER,'multiplier.txt')) as f:
         normalizerMultiplier = float(f.read())
 
 

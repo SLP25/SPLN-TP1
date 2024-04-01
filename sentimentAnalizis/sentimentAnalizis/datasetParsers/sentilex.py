@@ -1,4 +1,5 @@
-from .utils import parser,average_parser
+from .utils import parser,average_parser,getDatasetFolder
+import os
 
 def sentilex(destinationFolder):
     def aux(line):
@@ -9,7 +10,7 @@ def sentilex(destinationFolder):
             pol=float(pol[7:])
             return (word,pol)
         return None
-    parser("datasets/sentilex",'sentilex.txt',aux,destinationFolder)
+    parser(os.path.join(getDatasetFolder(),"sentilex"),'sentilex.txt',aux,destinationFolder)
     
 def sentilexlemmas(destinationFolder):
     def aux(line):
@@ -21,7 +22,7 @@ def sentilexlemmas(destinationFolder):
             pol=float(pol[7:])
             return (lemma,pol)
         return None
-    average_parser("datasets/sentilex",'sentilex.txt',aux,destinationFolder,'sentilexLemmas.json')
+    average_parser(os.path.join(getDatasetFolder(),"sentilex"),'sentilex.txt',aux,destinationFolder,'sentilexLemmas.json')
     
 def parseSentilex(destinationFolder):
     sentilex(destinationFolder)
