@@ -78,7 +78,7 @@ Estes valores foram obtidos após o programa ter cido calibrado usando o livro H
 
 ## Comparação
 
-![Vader vs leIA vs sentAnalize](https://github.com/lumafepe/SPLN-TP/diferenças.png "Vader vs leIA vs sentAnalize")
+![Vader vs leIA vs sentAnalize](https://github.com/lumafepe/SPLN-TP/blob/main/diferen%C3%A7as.png "Vader vs leIA vs sentAnalize")
 
 ## Recursos
 
