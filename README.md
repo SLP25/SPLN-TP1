@@ -1,4 +1,5 @@
 # SPLN-TP
+
 ## Instalação
 
 Para instalar o programa apenas é necessário fazer:
@@ -8,6 +9,13 @@ Para instalar o programa apenas é necessário fazer:
 git clone https://github.com/lumafepe/SPLN-TP
 cd sentimentAnalizis
 pip3 install .
+```
+
+### Ou
+
+
+```python
+pip install spln-sentiment-analysis
 ```
 
 ## Utilização

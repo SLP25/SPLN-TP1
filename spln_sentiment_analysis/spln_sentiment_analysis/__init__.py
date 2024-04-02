@@ -33,7 +33,7 @@ FILES:
 
 '''
 
-__version__ = "0.0.1"
+__version__ = "1.0.1"
 
 from .datasetParsers.parse import parseDatasets
 from .parser import analize,calibrate as calibrateFunc, normalize
