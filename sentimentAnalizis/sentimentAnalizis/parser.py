@@ -56,41 +56,51 @@ def process(input: str) -> list[list[str]]:
 #Takes a list of words and returns a list of tokens
 #Each token is either a base value, or a modifier
 def tokenize(sentence: list[str]) -> Iterable[Base|Modifier]:
+    pos=0
     while sentence != []:
         (consumed, token) = tokens.search(sentence)
         if token != None:
-            yield deepcopy(token)
+            nt = deepcopy(token)
+            nt.pos=pos
+            yield nt
             sentence = sentence[consumed:]
         else:
             sentence = sentence[1:]
+        pos+=1
 
 
 
 
-def applyModifiers(base: Base, index: int, modifiers: list[tuple[int,Modifier]]):
+def applyModifiers(bases:dict[int,Base],mod: list[Modifier]):
     (before, after) = modify_mask
+    
+    for p,mask in enumerate(reversed(before)):
+        pos = (p*-1)-1+mod.pos
+        if pos in bases:
+            bases[pos].apply(mod,mask)
+            
+    for p,mask in enumerate(after):
+        pos = p+1+mod.pos
+        if pos in bases:
+            bases[pos].apply(mod,mask)
 
-    cutoff = bisect_left(modifiers, index, 0, None, key=lambda im: im[0])
-    first = bisect_left(modifiers, index - len(after), 0, cutoff, key=lambda im: im[0])
-    last = bisect_right(modifiers, index + len(before) - 1, cutoff, None, key=lambda im: im[0])
-
-    for (i, m) in modifiers[first:cutoff]:
-        base.apply(m, after[index-i-1])
-
-    for (i, m) in modifiers[cutoff:last]:
-        base.apply(m, before[len(before)+index-i-1])
+    
+        
 
 #The modifier tokens act on the base values around them according to the modify_mask
 #Then the modified values are added together
 def evaluate(tokens: list[Base|Modifier]) -> list[Base]:
-    enumerated = list(enumerateWhen(tokens, lambda t: not t.is_modifier()))
-    bases = [(i,t) for i,t in enumerated if not t.is_modifier()]
-    modifiers = [(i,t) for i,t in enumerated if t.is_modifier()]
+    modifiers=[]
+    bases={}
+    for t in tokens:
+        if t.is_modifier(): modifiers.append(t)
+        else: bases[t.pos] = t
 
-    for i, b in bases:
-        applyModifiers(b, i, modifiers)
+    for m in modifiers:
+        applyModifiers(bases, m)
+        
+    return bases.values()
 
-    return [b for _,b in bases]
 
 
 #We can now use the already calculated tokens to add the emojis into the tokens

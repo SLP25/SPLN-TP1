@@ -2,6 +2,7 @@ class Modifier:
     def __init__(self, text: str, value: float):
         self.text = text
         self.value = value
+        self.pos=0
 
     def __str__(self) -> str:
         return f"<{self.text}|*{self.value}>"
@@ -18,6 +19,7 @@ class Base:
         self.base_value = value
         self._value = value
         self.modifiers = []
+        self.pos=0
 
     def __str__(self) -> str:
         return f"<{self.text}|{'-' if self.base_value < 0 else '+'}{abs(self.base_value)}|{'-' if self._value < 0 else '+'}{abs(self._value)}>"
