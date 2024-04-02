@@ -19,7 +19,7 @@ requires-python = ">=3.8"
 dynamic = ["version", "description"]
 
 [project.scripts]
-sentAnalize = "sentimentAnalizis:main"
-sentAnalize-init = "sentimentAnalizis:init"
-sentAnalize-calibrate = "sentimentAnalizis:calibrate"
+sentAnalize = "spln_sentiment_analysis:main"
+sentAnalize-init = "spln_sentiment_analysis:init"
+sentAnalize-calibrate = "spln_sentiment_analysis:calibrate"
     

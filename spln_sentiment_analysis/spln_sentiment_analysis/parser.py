@@ -71,7 +71,7 @@ def tokenize(sentence: list[str]) -> Iterable[Base|Modifier]:
 
 
 
-def applyModifiers(bases:dict[int,Base],mod: list[Modifier]):
+def applyModifiers(bases:dict[int,Base],mod: Modifier):
     (before, after) = modify_mask
     
     for p,mask in enumerate(reversed(before)):
@@ -84,8 +84,7 @@ def applyModifiers(bases:dict[int,Base],mod: list[Modifier]):
         if pos in bases:
             bases[pos].apply(mod,mask)
 
-    
-        
+
 
 #The modifier tokens act on the base values around them according to the modify_mask
 #Then the modified values are added together

@@ -1,14 +1,17 @@
 class Modifier:
     def __init__(self, text: str, value: float):
         self.text = text
-        self.value = value
-        self.pos=0
+        self._value = abs(value)
+        self._negate = value < 0
 
     def __str__(self) -> str:
-        return f"<{self.text}|*{self.value}>"
+        return f"<{self.text}|{'-' if self._negate else ''}*{self._value}>"
 
     def is_modifier(self) -> bool:
         return True
+    
+    def value(self, mask: float) -> float:
+        return pow(self._value, mask) * (-1 if self._negate else 1)
     
     def to_tuple(self):
         return (self.text, self.value)
@@ -29,7 +32,7 @@ class Base:
     
     def apply(self, modifier: Modifier, mask: float = 1):
         self.modifiers.append((modifier,mask))
-        self._value *= modifier.value * mask
+        self._value *= modifier.value(mask)
 
     def value(self) -> float:
         return self._value

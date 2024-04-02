@@ -16,9 +16,9 @@ def collect(lis: list[Base]) -> dict[str,list[Base]]:
         d[i.text].append(i)
     return d
 
-def collectModifiers(lis: list[Base]) -> dict[str,list[int]]:
+def collectModifiers(lis: list[Base]) -> dict[str,list[float]]:
     d=defaultdict(list)
     for i in lis:
         for mod,mask in i.modifiers:
-            d[mod.text].append(mod.value*mask)
+            d[mod.text].append(mod.value(mask))
     return d
