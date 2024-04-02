@@ -2,7 +2,9 @@
 
 '''
 Name 
-    sentAnalize - 
+    sentAnalize - analize the polarity of a text
+    sentAnalize-init - reconstruct the datasets of the program
+    sentAnalize-calibrate <file> - make the polarity of a text be equal to 0 
 
 SYNOPSIS
     -f <file> - Use file instead of stdin
@@ -13,12 +15,21 @@ SYNOPSIS
     -i <+|-> - Show only positive or negative polarity values
     -s <dec|inc|alp> - Sort the polarities in increasing, decreasing or alphabetical orders, respectively (decreasing is default)
     -l <limit> - Limit how many polarities are shown
+    -m - Show the average value of modifiers
     --help - Show this help message
 
 
 DESCRIPTIONS
-
+    Program to analize the polarity of a text in portuguese.
+    
 FILES:
+    datasetsParsers/
+    datasets/
+    testes/
+    parser.py
+    Token.py
+    Trie.py
+    utils.py
 
 '''
 
@@ -26,7 +37,7 @@ __version__ = "0.0.1"
 
 from .datasetParsers.parse import parseDatasets
 from .parser import analize,calibrate as calibrateFunc, normalize
-from .utils import collect
+from .utils import collect,collectModifiers
 import sys
 from jjcli import *
 from .datasetParsers.utils import getDatasetFolder
@@ -44,7 +55,7 @@ def calibrate():
             bases,_ = analize(f.read())
             calibrateFunc(bases)
 
-cl = clfilter("dcf:awl:i:s:n", doc=__doc__) ## Option values in cl.opt dictionary
+cl = clfilter("mdcf:awl:i:s:n", doc=__doc__) ## Option values in cl.opt dictionary
 
 def print_stat(value, occurences, label="", trimDecimals=False):
     prefix = f"{label} : " if label else ""
@@ -62,10 +73,15 @@ def handle_bases(bases, wordCount):
     #Or treat the words individually
     else:
         out=[]
-        for w,bs in collect(bases).items():
-            avg = sum([b.value() for b in bs])/len(bs)
-            out.append((w,avg,bs))
-        
+        if not '-m' in cl.opt:
+            for w,bs in collect(bases).items():
+                avg = sum([b.value() for b in bs])/len(bs)
+                out.append((w,avg,bs))
+        else:
+            for w,bs in collectModifiers(bases).items():
+                avg = sum(bs)/len(bs)
+                out.append((w,avg,bs))
+                
         #Sort the output
         reverse = cl.opt.get("-s") == "dec" or cl.opt.get("-s") == None
         key = (lambda x: x[0]) if cl.opt.get("-s") == "alp" else (lambda x: x[1])

@@ -28,7 +28,7 @@ class Base:
         return False
     
     def apply(self, modifier: Modifier, mask: float = 1):
-        self.modifiers.append(modifier)
+        self.modifiers.append((modifier,mask))
         self._value *= modifier.value * mask
 
     def value(self) -> float:
