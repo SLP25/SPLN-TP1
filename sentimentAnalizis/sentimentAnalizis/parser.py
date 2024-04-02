@@ -17,7 +17,6 @@ def load_dataset(dataset):
     with open(os.path.join(DATASETFOLDER,f'{dataset}.json')) as f:
         return json.load(f)
 
-
 words = load_dataset("words")
 lemmas = load_dataset("lemmas")
 boosters = load_dataset("boosters")
@@ -104,7 +103,6 @@ def analize(input: str) -> tuple[list[Base], int]:
     words = sum(len(s) for s in sentences)
     bases = list(itertools.chain.from_iterable(evaluate(tokenize(s)) for s in sentences))
     return bases, words
-
 
 
 def calibrate(bases: list[Base]):
