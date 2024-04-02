@@ -10,8 +10,8 @@ def enumerateWhen(it: Iterator[object], cond: Callable[[object],bool]) -> Iterat
         yield i, x
 
 
-def collect(list: list[Base]) -> dict[str,list[Base]]:
-    d=defaultdict(lambda:[])
-    for i in list:
+def collect(lis: list[Base]) -> dict[str,list[Base]]:
+    d=defaultdict(list)
+    for i in lis:
         d[i.text].append(i)
     return d
