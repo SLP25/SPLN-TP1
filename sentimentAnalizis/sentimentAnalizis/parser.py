@@ -24,7 +24,7 @@ negate = load_dataset("negate")
 emojis = load_dataset("emojis")
 
 tokens = Trie(starter={**{k:Base(k,v) for k,v in {**lemmas,**words}.items()},**{k:Modifier(k,v) for k,v in {**boosters,**negate}.items()}})
-modify_mask = ([0.2, 0.5, 0.8], [1, 0.9, 0.7, 0.5, 0.2])
+modify_mask = ([0.7], [1, 0.8])
 
 #Takes a space-bounded string and transforms it into individual ascii words/single emojis
 # "chapéu"      -> ["chapeu"]
