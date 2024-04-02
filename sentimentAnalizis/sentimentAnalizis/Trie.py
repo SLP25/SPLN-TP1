@@ -4,9 +4,9 @@ def TrieDefaultDict():
     return Trie()
 
 class Trie:
-    def __init__(self,defaultValue=None,starter={}):
+    def __init__(self,starter={}):
         self.items = defaultdict(TrieDefaultDict)
-        self.value = defaultValue
+        self.value = None
         for k,v in starter.items():
             items = k.split(' ')
             self.insert(items,v)
@@ -22,4 +22,8 @@ class Trie:
             return (0, self.value)
         else:
             (consumed, ans) = self.items[items[0]].search(items[1:])
-            return (consumed + 1, ans)
+            
+            if ans == None:
+                return (0, self.value)
+            else:
+                return (consumed + 1, ans)

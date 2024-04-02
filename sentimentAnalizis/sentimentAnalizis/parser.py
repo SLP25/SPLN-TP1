@@ -23,7 +23,7 @@ boosters = load_dataset("boosters")
 negate = load_dataset("negate")
 emojis = load_dataset("emojis")
 
-tokens = Trie(defaultValue=None,starter={**{k:Base(k,v) for k,v in {**lemmas,**words}.items()},**{k:Modifier(k,v) for k,v in {**boosters,**negate}.items()}})
+tokens = Trie(starter={**{k:Base(k,v) for k,v in {**lemmas,**words}.items()},**{k:Modifier(k,v) for k,v in {**boosters,**negate}.items()}})
 modify_mask = ([0.2, 0.5, 0.8], [1, 0.9, 0.7, 0.5, 0.2])
 
 #Takes a space-bounded string and transforms it into individual ascii words/single emojis
@@ -67,7 +67,7 @@ def tokenize(sentence: list[str]) -> Iterable[Base|Modifier]:
 
 
 
-def applyModifiers(base: Base, index: int, modifiers: list[Modifier]):
+def applyModifiers(base: Base, index: int, modifiers: list[tuple[int,Modifier]]):
     (before, after) = modify_mask
 
     cutoff = bisect_left(modifiers, index, 0, None, key=lambda im: im[0])
@@ -83,7 +83,7 @@ def applyModifiers(base: Base, index: int, modifiers: list[Modifier]):
 #The modifier tokens act on the base values around them according to the modify_mask
 #Then the modified values are added together
 def evaluate(tokens: list[Base|Modifier]) -> list[Base]:
-    enumerated = enumerateWhen(tokens, lambda t: not t.is_modifier())
+    enumerated = list(enumerateWhen(tokens, lambda t: not t.is_modifier()))
     bases = [(i,t) for i,t in enumerated if not t.is_modifier()]
     modifiers = [(i,t) for i,t in enumerated if t.is_modifier()]
 
@@ -97,7 +97,6 @@ def evaluate(tokens: list[Base|Modifier]) -> list[Base]:
 for emoji,description in emojis.items():
     value = sum(b.value() for b in evaluate(tokenize(description.split())))
     tokens.insert([emoji], Base(emoji, value * 2))   #We give it an "emoji bonus" since emojis are usually emotionally charged
-
 
 def analize(input: str) -> tuple[list[Base], int]:
     sentences = process(input)
