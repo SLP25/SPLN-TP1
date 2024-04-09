@@ -6,7 +6,7 @@ Para instalar o programa apenas é necessário fazer:
 
 
 ```bash
-git clone https://github.com/lumafepe/SPLN-TP
+git clone https://github.com/SLP25/SPLN-TP1.git
 cd sentimentAnalizis
 pip3 install .
 ```
